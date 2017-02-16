@@ -2,6 +2,7 @@ package SnakeGUI;
 
 
 import Model.Item;
+import Model.Location;
 import SnakeLogic.Game;
 
 import javafx.event.ActionEvent;
@@ -17,12 +18,9 @@ import java.util.*;
 
 public class GameViewController implements Initializable {
 
-    @FXML
-    Label labelStatus;
-    @FXML
-    Canvas canvas;
-    @FXML
-    Label itemsEaten;
+    @FXML private Label labelStatus;
+    @FXML private Canvas canvas;
+    @FXML private Label itemsEaten;
 
     private double fieldHeight;
     private double fieldWidth;
@@ -49,7 +47,6 @@ public class GameViewController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Game.getInstance().setViewController(this);
-
         calculateFields();
     }
     /**
@@ -63,7 +60,7 @@ public class GameViewController implements Initializable {
     /**
      * Draw the canvas
      */
-    public void updateCanvas(int X, int Y, List<Item> items) {
+    public void updateCanvas(int X, int Y, LinkedList<Location> locations, List<Item> items) {
         GraphicsContext g = canvas.getGraphicsContext2D();
 
         g.clearRect(0,0,width*fieldWidth ,height*fieldHeight);
@@ -81,9 +78,12 @@ public class GameViewController implements Initializable {
             g.fillRoundRect(item.getX() * fieldWidth, item.getY() * fieldHeight, fieldWidth, fieldHeight, 5,5);
         }
 
-        // draw 'player'
+        // draw 'player' //TODO: Border ??
         g.setFill(Color.WHITE);
         g.fillRoundRect(X * fieldWidth, Y * fieldHeight, fieldWidth, fieldHeight, 3, 3);
+        for (Location l: locations) {
+            g.fillRoundRect(l.getX() * fieldWidth, l.getY() * fieldHeight,fieldWidth, fieldHeight, 3, 3);
+        }
     }
 
     public void updateEatCount(int count){

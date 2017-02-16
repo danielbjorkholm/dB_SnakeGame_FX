@@ -2,41 +2,49 @@ package Model;
 
 import javafx.scene.input.KeyCode;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class Player{
 
-    private int X;
-    private int Y;
+    private int currX;
+    private int currY;
     private int mEatCount;
+    private LinkedList<Location> mLocations = new LinkedList<>();
 
     public Player() {
-        X = 0;
-        Y = 0;
+        currX = 0;
+        currY = 0;
         mEatCount = 0;
     }
 
-    public int getX() {
-        return X;
+    public int getCurrX() {
+        return currX;
     }
 
-    public void setX(int x) {
-        X = x;
+    public void setCurrX(int currX) {
+        this.currX = currX;
     }
 
-    public int getY() {
-        return Y;
+    public int getCurrY() {
+        return currY;
     }
 
-    public void setY(int y) {
-        Y = y;
+    public void setCurrY(int currY) {
+        this.currY = currY;
     }
 
     public void setXY(int x, int y){
-        this.X = x;
-        this.Y = y;
+        this.currX = x;
+        this.currY = y;
+    }
+
+    public LinkedList<Location> getLocations() {
+        return mLocations;
     }
 
     public boolean checkLocation(int x, int y){
-        if(this.X == x && this.Y == y){
+        if(this.currX == x && this.currY == y){
             return true;
         } else {
             return false;
@@ -52,22 +60,55 @@ public class Player{
     }
 
     // Hvordan giver man en overridet metode forskellige attributer ??
-    public void update(KeyCode keyPressed) {
+    public void update(KeyCode keyPressed, int width, int height) {
+        if (mLocations.size() < mEatCount) {
+            mLocations.addLast(new Location(currX, currY));
+        }
+        for (int i = mLocations.size(); i >= 1; i--) {
+            if(i == 1){
+                mLocations.get(i - 1).setX(currX);
+                mLocations.get(i - 1).setY(currY);
+            } else {
+                mLocations.get(i - 1).setX(mLocations.get(i - 2).getX());
+                mLocations.get(i - 1).setY(mLocations.get(i - 2).getY());
+            }
+        }
         switch (keyPressed)
         {
             case DOWN:
-                this.Y++;
+                this.currY++;
                 break;
             case LEFT:
-                this.X--;
+                this.currX--;
                 break;
             case RIGHT:
-                this.X++;
+                this.currX++;
                 break;
             case UP:
-                this.Y--;
+                this.currY--;
                 break;
         }
-        //TODO: Test om Player er inden for banen.
+
+        if(checkForTailGrab()||checkForOOB(width, height) ){
+            //TODO: Handle game over
+        }
+    }
+
+    private boolean checkForOOB(int width, int height) {
+        boolean result = false;
+        if ((currX < 0 || currX > width) && (currY < 0 || currY > height)){
+            result = true;
+        }
+        return result;
+    }
+
+    private boolean checkForTailGrab() {
+        boolean result = false;
+        for (Location l : mLocations){
+            if(l.getX() == currX && l.getY() == currY){
+                result = true;
+            }
+        }
+        return result;
     }
 }

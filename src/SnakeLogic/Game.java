@@ -14,73 +14,94 @@ import java.util.Random;
 public class Game {
     private static Game ourInstance = new Game();
     private GameViewController mViewController;
-    Random mRandomGenerator = new Random();
+    private Random mRandomGenerator = new Random();
+    private boolean mGameInstatiated = false;
 
-    private KeyCode mKeyPressed = KeyCode.BACK_SPACE;
+    private KeyCode mKeyPressed = KeyCode.RIGHT;
 
-    private final float mRefreshRate = 300;
+    private final float mRefreshRate = 5; //Original 300
     private Player mPlayer;
-    ArrayList<Item> mGameItems = new ArrayList<Item>();
+    private ArrayList<Item> mGameItems = new ArrayList<>();
 
     public static Game getInstance() {
         return ourInstance;
     }
 
     private Game() {
-
-
         // Start and control game loop
-        new AnimationTimer(){
+        new AnimationTimer() {
             long lastUpdate;
-            public void handle (long now) {
+
+            public void handle(long now) {
                 if (now > lastUpdate + mRefreshRate * 1000000) {
                     lastUpdate = now;
                     update(now);
                 }
             }
         }.start();
-
-        instantiateGame();
     }
 
     //Instantiating methods
     public void setViewController(GameViewController viewController) {
         mViewController = viewController;
     }
+
     public void setStage(Stage stage) {
         stage.getScene().setOnKeyPressed(event -> keyPressed(event.getCode())
-        );}
-    private void keyPressed(KeyCode keyCode)
-    {
+        );
+    }
+
+    private void keyPressed(KeyCode keyCode) {
         this.mKeyPressed = keyCode;
     }
-    public void instantiateGame(){
+
+    private void instantiateGame() {
+
+        System.out.println("Inst start");
+
         mPlayer = new Player();
-        mKeyPressed = KeyCode.BACK_SPACE;
+        mKeyPressed = KeyCode.RIGHT;
         mGameItems.clear();
         addGameItem();
     }
 
     private void addGameItem() {
-        int x = mPlayer.getX();
-        int y = mPlayer.getY();
+        int x = mPlayer.getCurrX();
+        int y = mPlayer.getCurrY();
 
-        while (mPlayer.checkLocation(x, y)) {
+        while (mPlayer.checkLocation(x, y)) { //TODO: Check for tail location too
             x = mRandomGenerator.nextInt(mViewController.getWidth());
             y = mRandomGenerator.nextInt(mViewController.getHeight());
+
+            mGameItems.add(new Item(x, y, false));
         }
-        mGameItems.add(new Item(x, y, false));
     }
 
     /**
      * Game loop - executed continously during the game
+     *
      * @param now game time in nano seconds
      */
     private void update(long now) {
-        mPlayer.update(mKeyPressed);
+        System.out.println("In loop: " + mViewController);
+        if (!mGameInstatiated){
+            instantiateGame();
+            mGameInstatiated = true;
+        }
+
+        mPlayer.update(mKeyPressed, mViewController.getWidth(), mViewController.getHeight());
+        if (mGameItems.isEmpty()) {
+            addGameItem();
+        }
+        if (mPlayer.checkLocation(mGameItems.get(0).getX(), mGameItems.get(0).getY())) {
+            mGameItems.clear();
+            addGameItem();
+            mPlayer.eat();
+            mViewController.updateEatCount(mPlayer.getEatCount());
+        }
 
 
-        mViewController.updateCanvas(mPlayer.getX(), mPlayer.getY(), mGameItems);
+        mViewController.updateCanvas(mPlayer.getCurrX(), mPlayer.getCurrY(),mPlayer.getLocations(), mGameItems);
     }
 
 }
