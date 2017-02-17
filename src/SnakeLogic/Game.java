@@ -5,10 +5,13 @@ import Model.Item;
 import Model.Player;
 
 import javafx.animation.AnimationTimer;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Random;
 
 public class Game {
@@ -16,10 +19,12 @@ public class Game {
     private GameViewController mViewController;
     private Random mRandomGenerator = new Random();
     private boolean mGameInstatiated = false;
+    private boolean mGameEnded = false;
+    private AnimationTimer mTimer;
 
     private KeyCode mKeyPressed = KeyCode.RIGHT;
 
-    private final float mRefreshRate = 5; //Original 300
+    private final float mRefreshRate = 150; //Original 300
     private Player mPlayer;
     private ArrayList<Item> mGameItems = new ArrayList<>();
 
@@ -34,6 +39,10 @@ public class Game {
 
             public void handle(long now) {
                 if (now > lastUpdate + mRefreshRate * 1000000) {
+                    if (mGameEnded){
+                        System.out.println("Stopping Timer");
+                        stop();
+                    }
                     lastUpdate = now;
                     update(now);
                 }
@@ -58,7 +67,7 @@ public class Game {
     private void instantiateGame() {
 
         System.out.println("Inst start");
-
+        mGameEnded = false;
         mPlayer = new Player();
         mKeyPressed = KeyCode.RIGHT;
         mGameItems.clear();
@@ -69,7 +78,7 @@ public class Game {
         int x = mPlayer.getCurrX();
         int y = mPlayer.getCurrY();
 
-        while (mPlayer.checkLocation(x, y)) { //TODO: Check for tail location too
+        while (mPlayer.checkLocation(x, y)) {
             x = mRandomGenerator.nextInt(mViewController.getWidth());
             y = mRandomGenerator.nextInt(mViewController.getHeight());
 
@@ -83,13 +92,13 @@ public class Game {
      * @param now game time in nano seconds
      */
     private void update(long now) {
-        System.out.println("In loop: " + mViewController);
         if (!mGameInstatiated){
             instantiateGame();
             mGameInstatiated = true;
         }
 
         mPlayer.update(mKeyPressed, mViewController.getWidth(), mViewController.getHeight());
+
         if (mGameItems.isEmpty()) {
             addGameItem();
         }
@@ -97,11 +106,26 @@ public class Game {
             mGameItems.clear();
             addGameItem();
             mPlayer.eat();
-            mViewController.updateEatCount(mPlayer.getEatCount());
+
         }
 
-
+        if(!mPlayer.isAlive()) {
+            mGameEnded = true;
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Game Over");
+            alert.setContentText("You lost the game!! - Wanna retard ?????");
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.OK) {
+                 restart();
+            } else {
+                System.exit(0);
+            }
+        }
+        mViewController.updateEatCount(mPlayer.getEatCount());
         mViewController.updateCanvas(mPlayer.getCurrX(), mPlayer.getCurrY(),mPlayer.getLocations(), mGameItems);
     }
 
+    public void restart() {
+        instantiateGame();
+    }
 }

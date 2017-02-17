@@ -36,11 +36,6 @@ public class GameViewController implements Initializable {
         return height;
     }
 
-    public void btnStartAction(ActionEvent event) {
-        System.out.println("btn clicked");
-        labelStatus.setText("test");
-    }
-
     /**
      * Executed when JavaFX is initialized. Used to setup the Snake game
      */
@@ -91,6 +86,11 @@ public class GameViewController implements Initializable {
     }
 
 
+    public void handleRestart(ActionEvent actionEvent) {
+        Game.getInstance().restart();
+    }
 
+    public void handleGameOver() {
 
+    }
 }

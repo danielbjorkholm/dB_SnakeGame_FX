@@ -3,19 +3,20 @@ package Model;
 import javafx.scene.input.KeyCode;
 
 import java.util.LinkedList;
-import java.util.List;
 
 public class Player{
 
     private int currX;
     private int currY;
     private int mEatCount;
+    private boolean mAlive;
     private LinkedList<Location> mLocations = new LinkedList<>();
 
     public Player() {
         currX = 0;
         currY = 0;
         mEatCount = 0;
+        mAlive = true;
     }
 
     public int getCurrX() {
@@ -39,6 +40,10 @@ public class Player{
         this.currY = y;
     }
 
+    public boolean isAlive() {
+        return mAlive;
+    }
+
     public LinkedList<Location> getLocations() {
         return mLocations;
     }
@@ -47,6 +52,11 @@ public class Player{
         if(this.currX == x && this.currY == y){
             return true;
         } else {
+            for(Location l : mLocations){
+                if(l.getX() == x && l.getY() == y){
+                    return true;
+                }
+            }
             return false;
         }
     }
@@ -90,7 +100,8 @@ public class Player{
         }
 
         if(checkForTailGrab()||checkForOOB(width, height) ){
-            //TODO: Handle game over
+            System.out.println("Player dead!");
+            mAlive = false;
         }
     }
 
