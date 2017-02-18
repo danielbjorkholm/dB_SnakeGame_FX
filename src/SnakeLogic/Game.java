@@ -42,9 +42,11 @@ public class Game {
                     if (mGameEnded){
                         System.out.println("Stopping Timer");
                         stop();
+                        displayEndBox();
+                    } else {
+                        lastUpdate = now;
+                        update(now);
                     }
-                    lastUpdate = now;
-                    update(now);
                 }
             }
         }.start();
@@ -111,15 +113,7 @@ public class Game {
 
         if(!mPlayer.isAlive()) {
             mGameEnded = true;
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Game Over");
-            alert.setContentText("You lost the game!! - Wanna retard ?????");
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == ButtonType.OK) {
-                 restart();
-            } else {
-                System.exit(0);
-            }
+
         }
         mViewController.updateEatCount(mPlayer.getEatCount());
         mViewController.updateCanvas(mPlayer.getCurrX(), mPlayer.getCurrY(),mPlayer.getLocations(), mGameItems);
@@ -127,5 +121,12 @@ public class Game {
 
     public void restart() {
         instantiateGame();
+    }
+
+    private void displayEndBox(){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Game Over");
+        alert.setContentText("You lost the game!! - Wanna retard ?????");
+        alert.show();
     }
 }

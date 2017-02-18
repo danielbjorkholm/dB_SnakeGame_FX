@@ -98,8 +98,8 @@ public class Player{
                 this.currY--;
                 break;
         }
-
-        if(checkForTailGrab()||checkForOOB(width, height) ){
+        System.out.println(currX + "  " + currY);
+        if(checkForTailGrab()||checkForOOB(width, height)){
             System.out.println("Player dead!");
             mAlive = false;
         }
@@ -107,9 +107,11 @@ public class Player{
 
     private boolean checkForOOB(int width, int height) {
         boolean result = false;
-        if ((currX < 0 || currX > width) && (currY < 0 || currY > height)){
+        System.out.println("Checking OOB");
+        if ((currX < 0 || currX > width || currY < 0 || currY > height)){
             result = true;
         }
+        System.out.println(result);
         return result;
     }
 
