@@ -27,7 +27,7 @@
                   <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                </FlowPane.margin>
             </Button>
-            <Label fx:id="labelStatus" text="Label" />
+            <Label fx:id="btnRelatedLabel" text=""/>
             <Label fx:id="itemsEaten" text="">
                <FlowPane.margin>
                   <Insets left="200.0" />

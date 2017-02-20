@@ -18,7 +18,7 @@ import java.util.*;
 
 public class GameViewController implements Initializable {
 
-    @FXML private Label labelStatus;
+    @FXML private Label btnRelatedLabel;
     @FXML private Canvas canvas;
     @FXML private Label itemsEaten;
 
@@ -85,12 +85,15 @@ public class GameViewController implements Initializable {
         itemsEaten.setText("Items Eaten: " + count);
     }
 
+    public void showGameEnded(){
+        itemsEaten.setText("GAME OVER!");
+        btnRelatedLabel.setText("<- Press restart!");
+    }
+
 
     public void handleRestart(ActionEvent actionEvent) {
+        btnRelatedLabel.setText("");
         Game.getInstance().restart();
     }
 
-    public void handleGameOver() {
-
-    }
 }

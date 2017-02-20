@@ -6,12 +6,10 @@ import Model.Player;
 
 import javafx.animation.AnimationTimer;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.Random;
 
 public class Game {
@@ -39,14 +37,8 @@ public class Game {
 
             public void handle(long now) {
                 if (now > lastUpdate + mRefreshRate * 1000000) {
-                    if (mGameEnded){
-                        System.out.println("Stopping Timer");
-                        stop();
-                        displayEndBox();
-                    } else {
                         lastUpdate = now;
                         update(now);
-                    }
                 }
             }
         }.start();
@@ -94,39 +86,36 @@ public class Game {
      * @param now game time in nano seconds
      */
     private void update(long now) {
-        if (!mGameInstatiated){
-            instantiateGame();
-            mGameInstatiated = true;
-        }
 
-        mPlayer.update(mKeyPressed, mViewController.getWidth(), mViewController.getHeight());
+        if (!mGameEnded) {
+            if (!mGameInstatiated){
+                instantiateGame();
+                mGameInstatiated = true;
+            }
 
-        if (mGameItems.isEmpty()) {
-            addGameItem();
-        }
-        if (mPlayer.checkLocation(mGameItems.get(0).getX(), mGameItems.get(0).getY())) {
-            mGameItems.clear();
-            addGameItem();
-            mPlayer.eat();
+            mPlayer.update(mKeyPressed, mViewController.getWidth(), mViewController.getHeight());
 
+            if (mGameItems.isEmpty()) {
+                addGameItem();
+            }
+            if (mPlayer.checkLocation(mGameItems.get(0).getX(), mGameItems.get(0).getY())) {
+                mGameItems.clear();
+                addGameItem();
+                mPlayer.eat();
+            }
+            mViewController.updateEatCount(mPlayer.getEatCount());
+            mViewController.updateCanvas(mPlayer.getCurrX(), mPlayer.getCurrY(),mPlayer.getLocations(), mGameItems);
         }
 
         if(!mPlayer.isAlive()) {
             mGameEnded = true;
+            mViewController.showGameEnded();
 
         }
-        mViewController.updateEatCount(mPlayer.getEatCount());
-        mViewController.updateCanvas(mPlayer.getCurrX(), mPlayer.getCurrY(),mPlayer.getLocations(), mGameItems);
     }
 
     public void restart() {
         instantiateGame();
     }
 
-    private void displayEndBox(){
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Game Over");
-        alert.setContentText("You lost the game!! - Wanna retard ?????");
-        alert.show();
-    }
 }
