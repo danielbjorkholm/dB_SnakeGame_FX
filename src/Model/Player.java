@@ -19,7 +19,7 @@ public class Player implements GameObject{
     public Player() {
         currX = 0;
         currY = 0;
-        mEatCount = 1;
+        mEatCount = 0;
         mAlive = true;
     }
 
@@ -27,29 +27,12 @@ public class Player implements GameObject{
         return currX;
     }
 
-    public void setCurrX(int currX) {
-        this.currX = currX;
-    }
-
     public int getCurrY() {
         return currY;
     }
 
-    public void setCurrY(int currY) {
-        this.currY = currY;
-    }
-
-    public void setXY(int x, int y){
-        this.currX = x;
-        this.currY = y;
-    }
-
     public boolean isAlive() {
         return mAlive;
-    }
-
-    public LinkedList<TailPiece> getTailPieces() {
-        return mTailPieces;
     }
 
     public boolean checkLocation(int x, int y){
@@ -63,10 +46,6 @@ public class Player implements GameObject{
             }
             return false;
         }
-    }
-
-    public void eat(){
-        mEatCount++;
     }
 
     public int getEatCount() {
@@ -99,12 +78,14 @@ public class Player implements GameObject{
 
         //Hvis der er færre tailpieces end EatCount..
         if (mTailPieces.size() < mEatCount) {
-            //..læg et ekstra piece bag i halen.
+            //..læg et ekstra piece forrest i halen.
             mTailPieces.addLast(new TailPiece(prevX, prevY));
         }
 
+        //For hver tailpiece ..
         for (int i = mTailPieces.size(); i >= 1; i--) {
             if(i == 1){
+
                 mTailPieces.get(i - 1).setX(currX);
                 mTailPieces.get(i - 1).setY(currY);
             } else {
@@ -115,10 +96,10 @@ public class Player implements GameObject{
 
         System.out.println(currX + "  " + currY);
 
-        /*if(checkForTailGrab()||checkForOOB(width, height)){
+        if(checkForOOB(Board.getInstance().getWidth(), Board.getInstance().getHeight())) {
             System.out.println("Player dead!");
             mAlive = false;
-        }*/
+        }  // TODO: Spillet fryser, når det aktiveres
     }
 
     @Override
@@ -134,7 +115,6 @@ public class Player implements GameObject{
         }
     }
 
-    /*
     private boolean checkForOOB(int width, int height) {
         boolean result = false;
         System.out.println("Checking OOB");
@@ -153,5 +133,5 @@ public class Player implements GameObject{
             }
         }
         return result;
-    }*/
+    }
 }

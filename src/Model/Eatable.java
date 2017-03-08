@@ -2,6 +2,7 @@ package Model;
 
 import SnakeLogic.Board;
 import SnakeLogic.GameObject;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 
@@ -22,10 +23,6 @@ public class Eatable implements GameObject{
         }
     }
 
-    public Color getColor() {
-        return mColor;
-    }
-
     public int getX() {
         return x;
     }
@@ -40,11 +37,15 @@ public class Eatable implements GameObject{
 
     @Override
     public void update(KeyCode keypressed) {
-
+        //TODO: evt. selvdestruér efter x antal updates?
     }
 
     @Override
     public void draw(Board board) {
+        GraphicsContext g = board.getGraphicsContext();
+        g.setFill(mColor);
+        g.fillRoundRect(x * board.getFieldWidth(), y * board.getFieldHeight(),
+                        board.getFieldWidth(), board.getFieldHeight(), 5,5);
 
     }
 }

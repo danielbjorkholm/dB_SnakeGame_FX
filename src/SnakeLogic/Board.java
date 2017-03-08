@@ -2,7 +2,6 @@ package SnakeLogic;
 
 
 import Model.Eatable;
-import Model.TailPiece;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -52,7 +51,7 @@ public class Board {
         return mCanvas.getGraphicsContext2D();
     }
 
-    public void updateBoard(){
+    public void draw(){
         GraphicsContext g = mCanvas.getGraphicsContext2D();
 
         g.clearRect(0,0,mWidth*mFieldWidth ,mHeight*mFieldHeight);
@@ -64,10 +63,9 @@ public class Board {
                 g.fillRoundRect(i*mFieldWidth, j*mFieldHeight, mFieldWidth,mFieldHeight, 5, 5);
             }
         }
-        // draw items
-        for (Eatable eatable : mEatables) {
-            g.setFill(eatable.getColor());
-            g.fillRoundRect(eatable.getX() * mFieldWidth, eatable.getY() * mFieldHeight, mFieldWidth, mFieldHeight, 5,5);
+        // draw eatables
+        for (Eatable e : mEatables) {
+            e.draw(this);
         }
     }
 

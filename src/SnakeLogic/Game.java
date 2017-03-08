@@ -6,7 +6,6 @@ import Model.Player;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 public class Game {
@@ -20,9 +19,7 @@ public class Game {
     private boolean mGameInstatiated = false;
     private boolean mGameEnded = false;
     private KeyCode mKeyPressed = KeyCode.RIGHT;
-
     private Player mPlayer;
-
 
     private Game() {}
 
@@ -58,7 +55,8 @@ public class Game {
             //Opdatér spiller objectet
             mPlayer.update(mKeyPressed);
 
-            mBoard.updateBoard();
+            //Tegn board og player
+            mBoard.draw();
             mPlayer.draw(mBoard);
 
         }
