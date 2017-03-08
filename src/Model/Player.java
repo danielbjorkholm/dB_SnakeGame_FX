@@ -1,21 +1,25 @@
 package Model;
 
+import SnakeLogic.Board;
+import SnakeLogic.GameObject;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
+import javafx.scene.paint.Color;
 
 import java.util.LinkedList;
 
-public class Player{
+public class Player implements GameObject{
 
     private int currX;
     private int currY;
     private int mEatCount;
     private boolean mAlive;
-    private LinkedList<Location> mLocations = new LinkedList<>();
+    private LinkedList<TailPiece> mTailPieces = new LinkedList<>();
 
     public Player() {
         currX = 0;
         currY = 0;
-        mEatCount = 0;
+        mEatCount = 1;
         mAlive = true;
     }
 
@@ -44,15 +48,15 @@ public class Player{
         return mAlive;
     }
 
-    public LinkedList<Location> getLocations() {
-        return mLocations;
+    public LinkedList<TailPiece> getTailPieces() {
+        return mTailPieces;
     }
 
     public boolean checkLocation(int x, int y){
         if(this.currX == x && this.currY == y){
             return true;
         } else {
-            for(Location l : mLocations){
+            for(TailPiece l : mTailPieces){
                 if(l.getX() == x && l.getY() == y){
                     return true;
                 }
@@ -70,21 +74,11 @@ public class Player{
     }
 
     // Hvordan giver man en overridet metode forskellige attributer ??
-    public void update(KeyCode keyPressed, int width, int height) {
-        if (mLocations.size() < mEatCount) {
-            mLocations.addLast(new Location(currX, currY));
-        }
-        for (int i = mLocations.size(); i >= 1; i--) {
-            if(i == 1){
-                mLocations.get(i - 1).setX(currX);
-                mLocations.get(i - 1).setY(currY);
-            } else {
-                mLocations.get(i - 1).setX(mLocations.get(i - 2).getX());
-                mLocations.get(i - 1).setY(mLocations.get(i - 2).getY());
-            }
-        }
-        switch (keyPressed)
-        {
+    public void update(KeyCode keyPressed) {
+        int prevX = currX;
+        int prevY = currY;
+
+        switch (keyPressed) {
             case DOWN:
                 this.currY++;
                 break;
@@ -98,13 +92,49 @@ public class Player{
                 this.currY--;
                 break;
         }
+
+        if(Board.getInstance().tryEatEatable(currX, currY)){
+            mEatCount++;
+        }
+
+        //Hvis der er færre tailpieces end EatCount..
+        if (mTailPieces.size() < mEatCount) {
+            //..læg et ekstra piece bag i halen.
+            mTailPieces.addLast(new TailPiece(prevX, prevY));
+        }
+
+        for (int i = mTailPieces.size(); i >= 1; i--) {
+            if(i == 1){
+                mTailPieces.get(i - 1).setX(currX);
+                mTailPieces.get(i - 1).setY(currY);
+            } else {
+                mTailPieces.get(i - 1).setX(mTailPieces.get(i - 2).getX());
+                mTailPieces.get(i - 1).setY(mTailPieces.get(i - 2).getY());
+            }
+        }
+
         System.out.println(currX + "  " + currY);
-        if(checkForTailGrab()||checkForOOB(width, height)){
+
+        /*if(checkForTailGrab()||checkForOOB(width, height)){
             System.out.println("Player dead!");
             mAlive = false;
+        }*/
+    }
+
+    @Override
+    public void draw(Board board) {
+        // draw 'player'
+        GraphicsContext g = board.getGraphicsContext();
+        g.setFill(Color.WHITE);
+        g.fillRoundRect(currX * board.getFieldWidth(), currY * board.getFieldHeight(),
+                            board.getFieldWidth(), board.getFieldHeight(), 3, 3);
+        for (TailPiece p: mTailPieces) {
+            g.fillRoundRect(p.getX() * board.getFieldWidth(), p.getY() * board.getFieldHeight(),
+                            board.getFieldWidth(), board.getFieldHeight(), 3, 3);
         }
     }
 
+    /*
     private boolean checkForOOB(int width, int height) {
         boolean result = false;
         System.out.println("Checking OOB");
@@ -117,11 +147,11 @@ public class Player{
 
     private boolean checkForTailGrab() {
         boolean result = false;
-        for (Location l : mLocations){
+        for (TailPiece l : mTailPieces){
             if(l.getX() == currX && l.getY() == currY){
                 result = true;
             }
         }
         return result;
-    }
+    }*/
 }

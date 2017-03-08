@@ -1,15 +1,17 @@
 package Model;
 
+import SnakeLogic.Board;
 import SnakeLogic.GameObject;
+import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 
-public class Item implements GameObject{
+public class Eatable implements GameObject{
     private Color mColor;
     private int x;
     private int y;
     private boolean mDangerous;
 
-    public Item(int x, int y, boolean dangerous) {
+    public Eatable(int x, int y, boolean dangerous) {
         this.x = x;
         this.y = y;
         mDangerous = dangerous;
@@ -37,7 +39,12 @@ public class Item implements GameObject{
     }
 
     @Override
-    public void update() {
+    public void update(KeyCode keypressed) {
+
+    }
+
+    @Override
+    public void draw(Board board) {
 
     }
 }

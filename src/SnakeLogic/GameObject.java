@@ -1,9 +1,11 @@
 package SnakeLogic;
 
-/**
- * Created by Ebbe Vang on 23-01-2017.
- */
+
+import javafx.scene.input.KeyCode;
+
 public interface GameObject {
 
-    void update();
+    void update(KeyCode keypressed);
+
+    void draw(Board board);
 }

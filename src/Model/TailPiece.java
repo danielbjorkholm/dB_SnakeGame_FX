@@ -1,10 +1,10 @@
 package Model;
 
-public class Location {
+public class TailPiece {
     private int X;
     private int Y;
 
-    Location(int x, int y) {
+    TailPiece(int x, int y) {
         X = x;
         Y = y;
     }

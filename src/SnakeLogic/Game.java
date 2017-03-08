@@ -1,11 +1,8 @@
 package SnakeLogic;
 
-import SnakeGUI.GameViewController;
-import Model.Item;
+import Model.Eatable;
 import Model.Player;
 
-import javafx.animation.AnimationTimer;
-import javafx.scene.control.Alert;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 
@@ -14,70 +11,27 @@ import java.util.Random;
 
 public class Game {
     private static Game ourInstance = new Game();
-    private GameViewController mViewController;
-    private Random mRandomGenerator = new Random();
-    private boolean mGameInstatiated = false;
-    private boolean mGameEnded = false;
-    private AnimationTimer mTimer;
-
-    private KeyCode mKeyPressed = KeyCode.RIGHT;
-
-    private final float mRefreshRate = 150; //Original 300
-    private Player mPlayer;
-    private ArrayList<Item> mGameItems = new ArrayList<>();
-
     public static Game getInstance() {
         return ourInstance;
     }
 
-    private Game() {
-        // Start and control game loop
-        new AnimationTimer() {
-            long lastUpdate;
+    private Board mBoard = Board.getInstance();
+    private Random mRandomGenerator = new Random();
+    private boolean mGameInstatiated = false;
+    private boolean mGameEnded = false;
+    private KeyCode mKeyPressed = KeyCode.RIGHT;
 
-            public void handle(long now) {
-                if (now > lastUpdate + mRefreshRate * 1000000) {
-                        lastUpdate = now;
-                        update(now);
-                }
-            }
-        }.start();
-    }
+    private Player mPlayer;
 
-    //Instantiating methods
-    public void setViewController(GameViewController viewController) {
-        mViewController = viewController;
-    }
+
+    private Game() {}
 
     public void setStage(Stage stage) {
         stage.getScene().setOnKeyPressed(event -> keyPressed(event.getCode())
         );
     }
-
     private void keyPressed(KeyCode keyCode) {
-        this.mKeyPressed = keyCode;
-    }
-
-    private void instantiateGame() {
-
-        System.out.println("Inst start");
-        mGameEnded = false;
-        mPlayer = new Player();
-        mKeyPressed = KeyCode.RIGHT;
-        mGameItems.clear();
-        addGameItem();
-    }
-
-    private void addGameItem() {
-        int x = mPlayer.getCurrX();
-        int y = mPlayer.getCurrY();
-
-        while (mPlayer.checkLocation(x, y)) {
-            x = mRandomGenerator.nextInt(mViewController.getWidth());
-            y = mRandomGenerator.nextInt(mViewController.getHeight());
-
-            mGameItems.add(new Item(x, y, false));
-        }
+        mKeyPressed = keyCode;
     }
 
     /**
@@ -85,34 +39,73 @@ public class Game {
      *
      * @param now game time in nano seconds
      */
-    private void update(long now) {
+    public void update(long now) {
 
+        //Hvis ikke er slut..
         if (!mGameEnded) {
+            //..og spillet ikke er startet..
             if (!mGameInstatiated){
+                //..Instantiér spillet
                 instantiateGame();
                 mGameInstatiated = true;
             }
 
-            mPlayer.update(mKeyPressed, mViewController.getWidth(), mViewController.getHeight());
+            //Så længe der er for få Eatables.
+            while(mBoard.getEatables().size() < 1){
+                addGameItem();
+            }
 
-            if (mGameItems.isEmpty()) {
-                addGameItem();
-            }
-            if (mPlayer.checkLocation(mGameItems.get(0).getX(), mGameItems.get(0).getY())) {
-                mGameItems.clear();
-                addGameItem();
-                mPlayer.eat();
-            }
-            mViewController.updateEatCount(mPlayer.getEatCount());
-            mViewController.updateCanvas(mPlayer.getCurrX(), mPlayer.getCurrY(),mPlayer.getLocations(), mGameItems);
+            //Opdatér spiller objectet
+            mPlayer.update(mKeyPressed);
+
+            mBoard.updateBoard();
+            mPlayer.draw(mBoard);
+
         }
 
         if(!mPlayer.isAlive()) {
             mGameEnded = true;
-            mViewController.showGameEnded();
 
         }
     }
+
+
+
+
+
+
+
+
+
+    private void instantiateGame() {
+
+        //Konstruér spiller object
+        mPlayer = new Player();
+        //Sæt Keycode
+        mKeyPressed = KeyCode.RIGHT;
+        //Ryd mEatables
+        mBoard.clearEatables();
+    }
+
+
+
+
+
+
+    private void addGameItem() {
+        int x = mPlayer.getCurrX();
+        int y = mPlayer.getCurrY();
+
+        while (mPlayer.checkLocation(x, y)) {
+            x = mRandomGenerator.nextInt(mBoard.getWidth());
+            y = mRandomGenerator.nextInt(mBoard.getHeight());
+
+            //TODO: Check også for overlappende eatables, hvis der skal flere på boardet.
+            mBoard.getEatables().add(new Eatable(x, y, false));
+        }
+    }
+
+
 
     public void restart() {
         instantiateGame();
