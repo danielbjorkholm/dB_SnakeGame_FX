@@ -2,6 +2,7 @@ package Model;
 
 import SnakeLogic.Board;
 import SnakeLogic.GameObject;
+import com.sun.org.apache.xpath.internal.SourceTree;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
@@ -86,20 +87,21 @@ public class Player implements GameObject{
         for (int i = mTailPieces.size(); i >= 1; i--) {
             if(i == 1){
 
-                mTailPieces.get(i - 1).setX(currX);
-                mTailPieces.get(i - 1).setY(currY);
+                mTailPieces.get(i - 1).setX(prevX);
+                mTailPieces.get(i - 1).setY(prevY);
             } else {
                 mTailPieces.get(i - 1).setX(mTailPieces.get(i - 2).getX());
                 mTailPieces.get(i - 1).setY(mTailPieces.get(i - 2).getY());
             }
         }
 
-        System.out.println(currX + "  " + currY);
+        System.out.println("Jake pos: " + currX + "  " + currY);
+        System.out.println("Tail pos: " + mTailPieces);
 
-        if(checkForOOB(Board.getInstance().getWidth(), Board.getInstance().getHeight())) {
+        if(checkForTailGrab() || checkForOOB(Board.getInstance().getWidth(), Board.getInstance().getHeight())) {
             System.out.println("Player dead!");
             mAlive = false;
-        }  // TODO: Spillet fryser, når det aktiveres
+        }
     }
 
     @Override
@@ -117,11 +119,9 @@ public class Player implements GameObject{
 
     private boolean checkForOOB(int width, int height) {
         boolean result = false;
-        System.out.println("Checking OOB");
         if ((currX < 0 || currX > width || currY < 0 || currY > height)){
             result = true;
         }
-        System.out.println(result);
         return result;
     }
 

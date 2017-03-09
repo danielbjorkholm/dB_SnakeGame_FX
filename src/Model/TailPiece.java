@@ -24,4 +24,12 @@ public class TailPiece {
     void setY(int y) {
         Y = y;
     }
+
+    @Override
+    public String toString() {
+        return "TailPiece{" +
+                "X=" + X +
+                ", Y=" + Y +
+                '}';
+    }
 }
